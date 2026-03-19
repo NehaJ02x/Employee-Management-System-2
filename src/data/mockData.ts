@@ -143,7 +143,7 @@ export const departments: Department[] = [
   { id: 'D002', name: 'Sales', head: 'Alex Kumar', employeeCount: 52, subDepartments: ['Inside Sales', 'Enterprise', 'Partnerships'], budget: '₹1.8 Cr' },
   { id: 'D003', name: 'Marketing', head: 'Mike Rajan', employeeCount: 35, subDepartments: ['Digital', 'Content', 'Brand'], budget: '₹1.2 Cr' },
   { id: 'D004', name: 'HR', head: 'Priya Desai', employeeCount: 28, subDepartments: ['Recruitment', 'People Ops', 'L&D'], budget: '₹80 L' },
-  { id: 'D005', name: 'Finance', head: 'Ravi Singh', employeeCount: 22, subDepartments: ['Accounting', 'Payroll', 'Compliance'], budget: '₹60 L' }
+  { id: 'D005', name: 'Finance', head: 'Ravi Singh', employeeCount: 22, subDepartments: ['Accounting', 'Payroll', 'Compliance'], budget: '₹60 L' },
 ];
 
 export interface SubDepartment {

@@ -115,7 +115,7 @@ export default function EmployeeDetail() {
       <CollapsibleSection title="Work Information">
         <div className="grid grid-cols-2 gap-y-4 gap-x-12">
           <InfoRow label="Department" value={emp.department} />
-          <InfoRow label="Zoho Role" value="Team member" />
+
           <InfoRow label="Location" value={emp.workLocation} />
           <InfoRow label="Employment Type" value={emp.type} />
           <InfoRow label="Designation" value={emp.designation} />

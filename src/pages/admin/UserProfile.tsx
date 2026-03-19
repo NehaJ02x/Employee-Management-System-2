@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, Building2, Mail, Users, Award, Phone, PhoneCall, MapPin, Monitor, Edit3, ChevronUp, Briefcase, GraduationCap, ArrowUpRight, ArrowDownRight, Clock } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Building2, Mail, Award, Phone, PhoneCall, MapPin, Monitor, Edit3, ChevronUp, Briefcase, GraduationCap, ArrowUpRight, ArrowDownRight, Clock } from 'lucide-react';
 import { employees } from '../../data/mockData';
 
 const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -111,7 +111,7 @@ export default function UserProfile() {
   const infoCards = [
     { icon: Building2, label: 'Department', value: emp.department },
     { icon: Mail, label: 'Email address', value: emp.email },
-    { icon: Users, label: 'Zoho Role', value: 'Team member' },
+
     { icon: Award, label: 'Designation', value: emp.designation },
     { icon: Phone, label: 'Work Phone Number', value: emp.phone },
     { icon: PhoneCall, label: 'Extension', value: emp.extension },
@@ -169,7 +169,7 @@ export default function UserProfile() {
           </CollapsibleSection>
           <CollapsibleSection title="Work Information">
             <div className="grid grid-cols-2 gap-y-4 gap-x-12">
-              <InfoRow label="Department" value={emp.department} /><InfoRow label="Zoho Role" value="Team member" />
+              <InfoRow label="Department" value={emp.department} />
               <InfoRow label="Location" value={emp.workLocation} /><InfoRow label="Employment Type" value={emp.type} />
               <InfoRow label="Designation" value={emp.designation} /><InfoRow label="Employee Status" value={emp.status} />
               <div /><InfoRow label="Source of Hire" value={emp.sourceOfHire} />

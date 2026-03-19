@@ -15,7 +15,7 @@ const statusColors: Record<string, string> = {
 
 const allColumns = [
   'Employee ID', 'First Name', 'Last Name', 'Nick name', 'Email address',
-  'Department', 'Designation', 'Zoho Role', 'Employment Type', 'Employee Status',
+  'Department', 'Designation', 'Employment Type', 'Employee Status',
   'Source of Hire', 'Date of Joining', 'Current Experience', 'Total Experience',
 ];
 
@@ -191,7 +191,7 @@ export default function EmployeesTab() {
                       {isColVisible('Email address') && <td className="px-3 py-3 text-gray-700">{emp.email}</td>}
                       {isColVisible('Department') && <td className="px-3 py-3 text-gray-700">{emp.department}</td>}
                       {isColVisible('Designation') && <td className="px-3 py-3 text-gray-700">{emp.designation}</td>}
-                      {isColVisible('Zoho Role') && <td className="px-3 py-3 text-gray-700">Team member</td>}
+
                       {isColVisible('Employment Type') && <td className="px-3 py-3 text-gray-700">{emp.type}</td>}
                       {isColVisible('Employee Status') && <td className="px-3 py-3"><span className={`font-medium ${statusColors[emp.status] || 'text-gray-500'}`}>{emp.status}</span></td>}
                       {isColVisible('Source of Hire') && <td className="px-3 py-3 text-gray-400">{emp.sourceOfHire || '-'}</td>}
