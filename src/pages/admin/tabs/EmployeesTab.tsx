@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { ChevronDown, Filter, Maximize2, MoreHorizontal, ArrowUpDown, X, Camera, Search, User, Briefcase, Shield, Phone, Heart, GraduationCap, Building2, Users, Check } from 'lucide-react';
+import { ChevronDown, Filter, Maximize2, MoreHorizontal, ArrowUpDown, X, Camera, Search, User, Briefcase, Shield, Phone, Heart, GraduationCap, Building2, Users, Check, Trash2, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { employees, departments, designations, subDepartments } from '../../../data/mockData';
 
@@ -45,6 +45,12 @@ export default function EmployeesTab() {
   const [form, setForm] = useState<FormState>(initialForm);
   const [activeFormSection, setActiveFormSection] = useState(0);
   const [addedEmployees, setAddedEmployees] = useState<typeof employees>([]);
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
+  const [actionMenuId, setActionMenuId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<typeof employees[0] | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [statusTarget, setStatusTarget] = useState<{ emp: typeof employees[0]; newStatus: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Filters
@@ -53,13 +59,28 @@ export default function EmployeesTab() {
   const [filterLocation, setFilterLocation] = useState('');
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(allColumns));
 
-  const allEmployees = [...employees, ...addedEmployees];
+  const allEmployees = [...employees, ...addedEmployees]
+    .filter(e => !deletedIds.has(e.id))
+    .map(e => statusOverrides[e.id] ? { ...e, status: statusOverrides[e.id] as typeof e.status } : e);
   const filtered = allEmployees.filter(e => {
     if (filterSearch && !e.name.toLowerCase().includes(filterSearch.toLowerCase()) && !e.id.toLowerCase().includes(filterSearch.toLowerCase())) return false;
     if (filterDept && e.department !== filterDept) return false;
     if (filterLocation && e.workLocation !== filterLocation) return false;
     return true;
   });
+
+  const handleDeleteEmployee = () => {
+    if (!deleteTarget || deleteConfirmText !== deleteTarget.name) return;
+    setDeletedIds(prev => new Set([...prev, deleteTarget.id]));
+    setDeleteTarget(null);
+    setDeleteConfirmText('');
+  };
+
+  const handleStatusChange = () => {
+    if (!statusTarget) return;
+    setStatusOverrides(prev => ({ ...prev, [statusTarget.emp.id]: statusTarget.newStatus }));
+    setStatusTarget(null);
+  };
 
   const locations = [...new Set(allEmployees.map(e => e.workLocation))];
   const getFirstName = (name: string) => name.split(' ')[0];
@@ -174,6 +195,7 @@ export default function EmployeesTab() {
                       <span className="flex items-center gap-1">{h} <ArrowUpDown size={12} /></span>
                     </th>
                   ))}
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -198,6 +220,37 @@ export default function EmployeesTab() {
                       {isColVisible('Date of Joining') && <td className="px-3 py-3 text-gray-700">{emp.joinDate}</td>}
                       {isColVisible('Current Experience') && <td className="px-3 py-3 text-gray-700">{calcExp(emp.joinDate)}</td>}
                       {isColVisible('Total Experience') && <td className="px-3 py-3 text-gray-700">{emp.totalExperience || '-'}</td>}
+                      <td className="px-3 py-3">
+                        <div className="relative">
+                          <button onClick={(e) => { e.stopPropagation(); setActionMenuId(actionMenuId === emp.id ? null : emp.id); }} className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600">
+                            <MoreHorizontal size={16} />
+                          </button>
+                          {actionMenuId === emp.id && (
+                            <>
+                              <div className="fixed inset-0 z-10" onClick={() => setActionMenuId(null)} />
+                              <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20 min-w-[200px]">
+                                <button onClick={() => { navigate(`/employee-management/employees/${emp.id}`); setActionMenuId(null); }} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                                  View Details
+                                </button>
+                                <div className="border-t border-gray-100 my-1" />
+                                <p className="px-3 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Change Status</p>
+                                {(['Active', 'Probation', 'Notice Period', 'Inactive'] as const).map(s => (
+                                  <button key={s} onClick={() => { if (s !== emp.status) { setStatusTarget({ emp, newStatus: s }); setActionMenuId(null); } }}
+                                    disabled={s === emp.status}
+                                    className={`w-full text-left px-3 py-1.5 text-sm flex items-center gap-2 ${s === emp.status ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'}`}>
+                                    <span className={`w-2 h-2 rounded-full ${s === 'Active' ? 'bg-green-500' : s === 'Probation' ? 'bg-amber-500' : s === 'Notice Period' ? 'bg-red-500' : 'bg-gray-400'}`} />
+                                    {s} {s === emp.status && <Check size={12} className="ml-auto text-gray-300" />}
+                                  </button>
+                                ))}
+                                <div className="border-t border-gray-100 my-1" />
+                                <button onClick={() => { setDeleteTarget(emp); setActionMenuId(null); }} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                  <Trash2 size={14} /> Delete Employee
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}
@@ -262,6 +315,85 @@ export default function EmployeesTab() {
           </div>
         )}
       </div>
+
+      {/* ===== DELETE CONFIRMATION MODAL ===== */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setDeleteTarget(null); setDeleteConfirmText(''); }} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                  <Trash2 size={20} className="text-red-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-base font-semibold text-gray-900">Delete Employee</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    This will permanently remove <span className="font-medium text-gray-700">{deleteTarget.name}</span> ({deleteTarget.id}) and all associated data. This action cannot be undone.
+                  </p>
+                  <div className="mt-4">
+                    <label className="text-xs font-medium text-gray-600 block mb-1.5">
+                      Type <span className="font-bold text-gray-900">"{deleteTarget.name}"</span> to confirm
+                    </label>
+                    <input className={inputCls} placeholder={deleteTarget.name} value={deleteConfirmText} onChange={e => setDeleteConfirmText(e.target.value)} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-3 border-t border-gray-200 bg-gray-50">
+              <button onClick={() => { setDeleteTarget(null); setDeleteConfirmText(''); }} className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100">Cancel</button>
+              <button onClick={handleDeleteEmployee} disabled={deleteConfirmText !== deleteTarget.name}
+                className={`px-5 py-2 text-sm text-white rounded-lg font-medium transition-colors ${deleteConfirmText === deleteTarget.name ? 'bg-red-600 hover:bg-red-700' : 'bg-red-300 cursor-not-allowed'}`}>
+                Delete Employee
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== STATUS CHANGE CONFIRMATION ===== */}
+      {statusTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setStatusTarget(null)} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-start gap-4">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                  statusTarget.newStatus === 'Active' ? 'bg-green-100' : statusTarget.newStatus === 'Inactive' ? 'bg-gray-100' : statusTarget.newStatus === 'Notice Period' ? 'bg-red-100' : 'bg-amber-100'
+                }`}>
+                  <AlertTriangle size={20} className={
+                    statusTarget.newStatus === 'Active' ? 'text-green-600' : statusTarget.newStatus === 'Inactive' ? 'text-gray-500' : statusTarget.newStatus === 'Notice Period' ? 'text-red-600' : 'text-amber-600'
+                  } />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900">Change Employee Status</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Change <span className="font-medium text-gray-700">{statusTarget.emp.name}</span>'s status from{' '}
+                    <span className={`inline-flex px-1.5 py-0.5 rounded text-xs font-medium ${statusColors[statusTarget.emp.status] || 'text-gray-500'}`}>{statusTarget.emp.status}</span>
+                    {' '}to{' '}
+                    <span className={`inline-flex px-1.5 py-0.5 rounded text-xs font-medium ${
+                      statusTarget.newStatus === 'Active' ? 'text-green-600' : statusTarget.newStatus === 'Probation' ? 'text-amber-600' : statusTarget.newStatus === 'Notice Period' ? 'text-red-600' : 'text-gray-500'
+                    }`}>{statusTarget.newStatus}</span>?
+                  </p>
+                  {statusTarget.newStatus === 'Inactive' && (
+                    <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-100">
+                      <p className="text-xs text-red-700">Setting status to <strong>Inactive</strong> will mark today as the date of exit.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-3 border-t border-gray-200 bg-gray-50">
+              <button onClick={() => setStatusTarget(null)} className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100">Cancel</button>
+              <button onClick={handleStatusChange} className={`px-5 py-2 text-sm text-white rounded-lg font-medium ${
+                statusTarget.newStatus === 'Active' ? 'bg-green-600 hover:bg-green-700' : statusTarget.newStatus === 'Inactive' ? 'bg-gray-600 hover:bg-gray-700' : statusTarget.newStatus === 'Notice Period' ? 'bg-red-600 hover:bg-red-700' : 'bg-amber-600 hover:bg-amber-700'
+              }`}>
+                Confirm Change
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ===== ADD EMPLOYEE MODAL ===== */}
       {showAddModal && (() => {
