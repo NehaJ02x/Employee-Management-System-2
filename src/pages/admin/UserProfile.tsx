@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, Building2, Mail, Award, Phone, PhoneCall, MapPin, Monitor, Edit3, ChevronUp, Briefcase, GraduationCap, ArrowUpRight, ArrowDownRight, Clock } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Building2, Mail, Award, Phone, PhoneCall, MapPin, Monitor, Edit3, ChevronUp, Briefcase, GraduationCap, ArrowUpRight, ArrowDownRight, Clock, FileText, Download, Upload, Eye } from 'lucide-react';
 import { employees } from '../../data/mockData';
 
 const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -199,6 +199,58 @@ export default function UserProfile() {
               <InfoRow label="Seating Location" value={emp.seatingLocation} /><InfoRow label="Tags" value="-" />
               <InfoRow label="Present Address" value={emp.address} /><InfoRow label="Permanent Address" value={emp.permanentAddress} />
               <InfoRow label="Personal Mobile Number" value={emp.personalMobile} /><InfoRow label="Personal Email Address" value={emp.personalEmail} />
+            </div>
+          </CollapsibleSection>
+          <CollapsibleSection title="Documents">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs text-gray-500">Important employee documents</p>
+                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition-colors">
+                  <Upload size={13} /> Upload Document
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { name: 'Aadhaar Card', type: 'ID Proof', date: '15 Jan 2024', uploaded: true },
+                  { name: 'PAN Card', type: 'Tax Document', date: '15 Jan 2024', uploaded: true },
+                  { name: 'Offer Letter', type: 'Employment', date: '10 Dec 2023', uploaded: true },
+                  { name: 'Resume / CV', type: 'Employment', date: '08 Dec 2023', uploaded: true },
+                  { name: 'Educational Certificates', type: 'Education', date: '15 Jan 2024', uploaded: true },
+                  { name: 'Address Proof', type: 'ID Proof', date: '15 Jan 2024', uploaded: true },
+                  { name: 'Bank Passbook / Cheque', type: 'Banking', date: '20 Jan 2024', uploaded: true },
+                  { name: 'Relieving Letter', type: 'Employment', date: '', uploaded: false },
+                  { name: 'Experience Letter', type: 'Employment', date: '', uploaded: false },
+                ].map((doc, i) => (
+                  <div key={i} className={`flex items-start gap-3 p-3.5 rounded-lg border ${doc.uploaded ? 'border-gray-200 bg-white' : 'border-dashed border-gray-300 bg-gray-50'}`}>
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${doc.uploaded ? 'bg-indigo-50 text-indigo-600' : 'bg-gray-100 text-gray-400'}`}>
+                      <FileText size={18} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{doc.name}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">{doc.type}</p>
+                      {doc.uploaded ? (
+                        <p className="text-xs text-gray-400 mt-1">Uploaded: {doc.date}</p>
+                      ) : (
+                        <p className="text-xs text-amber-500 mt-1">Not uploaded</p>
+                      )}
+                    </div>
+                    {doc.uploaded ? (
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <button className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors" title="View">
+                          <Eye size={14} />
+                        </button>
+                        <button className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors" title="Download">
+                          <Download size={14} />
+                        </button>
+                      </div>
+                    ) : (
+                      <button className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors flex-shrink-0" title="Upload">
+                        <Upload size={14} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </CollapsibleSection>
           <CollapsibleSection title="Separation Information" defaultOpen={false}>
