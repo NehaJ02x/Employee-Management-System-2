@@ -37,10 +37,7 @@ const allModules: ModuleItem[] = [
 
 const defaultFavourites = ['dashboard', 'employee-management'];
 
-const navItems = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/employee-management', label: 'Employee Management', icon: Users },
-];
+
 
 function AllModulesPanel({ onClose }: { onClose: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
