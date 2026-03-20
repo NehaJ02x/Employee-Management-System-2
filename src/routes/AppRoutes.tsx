@@ -25,6 +25,10 @@ import UserProfile from '../pages/admin/UserProfile';
 
 // Admin — Attendance & Leave
 import AdminAttendance from '../pages/admin/Attendance';
+import AttendanceLayout from '../pages/admin/AttendanceLayout';
+import AttendanceRecordsTab from '../pages/admin/tabs/AttendanceRecordsTab';
+import AttendanceCalendarTab from '../pages/admin/tabs/AttendanceCalendarTab';
+import AttendanceReportsTab from '../pages/admin/tabs/AttendanceReportsTab';
 import AdminLeave from '../pages/admin/Leave';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -60,7 +64,11 @@ export default function AppRoutes() {
           <Route path="user-operations/:id" element={<UserProfile />} />
         </Route>
 
-        <Route path="/attendance" element={<AdminAttendance />} />
+        <Route path="/attendance" element={<AttendanceLayout />}>
+          <Route index element={<AttendanceRecordsTab />} />
+          <Route path="calendar" element={<AttendanceCalendarTab />} />
+          <Route path="reports" element={<AttendanceReportsTab />} />
+        </Route>
         <Route path="/leave" element={<AdminLeave />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />

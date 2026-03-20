@@ -17,6 +17,9 @@ import {
   Award,
   Clock,
   CalendarDays,
+  ClipboardList,
+  Calendar as CalendarIcon,
+  FileBarChart,
 } from 'lucide-react';
 
 interface ModuleItem {
@@ -30,8 +33,10 @@ interface ModuleItem {
 
 const allModules: ModuleItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, to: '/', end: true, category: 'General' },
-  { id: 'attendance', label: 'Attendance', icon: Clock, to: '/attendance', category: 'General' },
   { id: 'leave', label: 'Leave', icon: CalendarDays, to: '/leave', category: 'General' },
+  { id: 'attendance-records', label: 'Records', icon: ClipboardList, to: '/attendance', end: true, category: 'Attendance' },
+  { id: 'attendance-calendar', label: 'Calendar', icon: CalendarIcon, to: '/attendance/calendar', category: 'Attendance' },
+  { id: 'attendance-reports', label: 'Reports', icon: FileBarChart, to: '/attendance/reports', category: 'Attendance' },
   { id: 'employees', label: 'Employees', icon: Users, to: '/employee-management', end: true, category: 'Employee Management' },
   { id: 'user-operations', label: 'User-specific Operations', icon: UserCog, to: '/employee-management/user-operations', category: 'Employee Management' },
   { id: 'insights', label: 'Insights', icon: BarChart3, to: '/employee-management/insights', category: 'Employee Management' },
@@ -39,7 +44,7 @@ const allModules: ModuleItem[] = [
   { id: 'designations', label: 'Designations', icon: Award, to: '/employee-management/designations', category: 'Employee Management' },
 ];
 
-const defaultFavourites = ['dashboard', 'employees', 'attendance', 'leave'];
+const defaultFavourites = ['dashboard', 'employees', 'attendance-records', 'leave'];
 
 function AllModulesPanel({ onClose }: { onClose: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -79,6 +84,7 @@ function AllModulesPanel({ onClose }: { onClose: () => void }) {
 
   const generalModules = filteredModules.filter(m => m.category === 'General');
   const employeeManagementModules = filteredModules.filter(m => m.category === 'Employee Management');
+  const attendanceModules = filteredModules.filter(m => m.category === 'Attendance');
   const favouriteModules = allModules.filter(m => favourites.includes(m.id));
 
   return (
@@ -238,6 +244,45 @@ function AllModulesPanel({ onClose }: { onClose: () => void }) {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {employeeManagementModules.map(mod => (
+                  <div key={mod.id}
+                    onClick={() => handleModuleClick(mod.to)}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
+                      transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f9fafb')}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  >
+                    <span style={{ fontSize: 14, color: '#374151' }}>{mod.label}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <button
+                        onClick={e => { e.stopPropagation(); toggleFavourite(mod.id); }}
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 2 }}
+                      >
+                        <Star size={14} style={{
+                          color: favourites.includes(mod.id) ? '#818cf8' : '#d1d5db',
+                          fill: favourites.includes(mod.id) ? '#818cf8' : 'none',
+                        }} />
+                      </button>
+                      <ChevronRight size={14} style={{ color: '#d1d5db' }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Attendance */}
+            <div style={{ flex: 1 }}>
+              <div style={{
+                fontSize: 11, fontWeight: 600, color: '#9ca3af',
+                textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8,
+                display: 'flex', alignItems: 'center', gap: 6,
+              }}>
+                <Clock size={12} /> Attendance
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {attendanceModules.map(mod => (
                   <div key={mod.id}
                     onClick={() => handleModuleClick(mod.to)}
                     style={{

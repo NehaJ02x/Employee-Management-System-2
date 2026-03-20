@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, X, ChevronLeft, ChevronRight, ChevronDown, UserCog, BarChart3, Building2, Award, Clock, CalendarDays } from 'lucide-react';
+import { LayoutDashboard, Users, X, ChevronLeft, ChevronRight, ChevronDown, UserCog, BarChart3, Building2, Award, Clock, CalendarDays, ClipboardList, Calendar as CalendarIcon, FileBarChart } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -17,10 +17,18 @@ const empSubItems = [
   { to: '/employee-management/designations', label: 'Designations', icon: Award },
 ];
 
+const attendanceSubItems = [
+  { to: '/attendance', label: 'Records', icon: ClipboardList, end: true },
+  { to: '/attendance/calendar', label: 'Calendar', icon: CalendarIcon },
+  { to: '/attendance/reports', label: 'Reports', icon: FileBarChart },
+];
+
 export default function Sidebar({ isOpen, collapsed, onClose, onToggleCollapse }: SidebarProps) {
   const location = useLocation();
   const isEmpActive = location.pathname.startsWith('/employee-management');
   const [empOpen, setEmpOpen] = useState(isEmpActive);
+  const isAttendanceActive = location.pathname.startsWith('/attendance');
+  const [attendanceOpen, setAttendanceOpen] = useState(isAttendanceActive);
 
   const linkStyle = (isActive: boolean) => ({
     display: 'flex',
@@ -162,20 +170,78 @@ export default function Sidebar({ isOpen, collapsed, onClose, onToggleCollapse }
             </NavLink>
           )}
 
-          {/* Attendance */}
-          <NavLink
-            to="/attendance"
-            onClick={onClose}
-            style={({ isActive }) => ({
-              ...linkStyle(isActive),
-              justifyContent: collapsed ? 'center' : undefined,
-              padding: collapsed ? '10px' : '10px 14px',
-            })}
-            title={collapsed ? 'Attendance' : undefined}
-          >
-            <Clock size={18} />
-            {!collapsed && <span className="flex-1 truncate">Attendance</span>}
-          </NavLink>
+          {/* Attendance - Collapsible */}
+          {!collapsed ? (
+            <>
+              <button
+                onClick={() => setAttendanceOpen(o => !o)}
+                style={{
+                  ...linkStyle(isAttendanceActive && !attendanceOpen),
+                  width: '100%',
+                  border: 'none',
+                  cursor: 'pointer',
+                  justifyContent: 'space-between',
+                  backgroundColor: isAttendanceActive ? '#eef2ff' : 'transparent',
+                  color: isAttendanceActive ? '#4338ca' : '#6b7280',
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <Clock size={18} />
+                  <span>Attendance</span>
+                </span>
+                <ChevronDown
+                  size={16}
+                  style={{
+                    transition: 'transform 0.2s',
+                    transform: attendanceOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }}
+                />
+              </button>
+
+              {/* Sub-items */}
+              {attendanceOpen && (
+                <div style={{ paddingLeft: 16, marginTop: 2 }}>
+                  {attendanceSubItems.map(sub => (
+                    <NavLink
+                      key={sub.to}
+                      to={sub.to}
+                      end={sub.end}
+                      onClick={onClose}
+                      style={({ isActive }) => ({
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        padding: '8px 12px',
+                        marginBottom: 1,
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 400,
+                        textDecoration: 'none',
+                        transition: 'all 0.15s ease',
+                        backgroundColor: isActive ? '#e0e7ff' : 'transparent',
+                        color: isActive ? '#4338ca' : '#6b7280',
+                      })}
+                    >
+                      <sub.icon size={15} />
+                      <span>{sub.label}</span>
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <NavLink
+              to="/attendance"
+              style={({ isActive }) => ({
+                ...linkStyle(isActive),
+                justifyContent: 'center',
+                padding: '10px',
+              })}
+              title="Attendance"
+            >
+              <Clock size={18} />
+            </NavLink>
+          )}
 
           {/* Leave */}
           <NavLink
