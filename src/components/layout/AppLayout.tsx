@@ -348,8 +348,6 @@ export default function AppLayout() {
           overflow: 'visible',
         }}>
           <div style={{
-            maxWidth: 1440,
-            margin: '0 auto',
             display: 'flex',
             alignItems: 'stretch',
             justifyContent: 'space-between',
