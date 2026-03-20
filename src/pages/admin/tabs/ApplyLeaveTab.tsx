@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { FileText } from 'lucide-react';
 import ProgressBar from '../../../components/common/ProgressBar';
 import { leaveBalances, employees } from '../../../data/mockData';
