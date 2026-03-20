@@ -15,6 +15,8 @@ import {
   BarChart3,
   Building2,
   Award,
+  Clock,
+  CalendarDays,
 } from 'lucide-react';
 
 interface ModuleItem {
@@ -28,6 +30,8 @@ interface ModuleItem {
 
 const allModules: ModuleItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, to: '/', end: true, category: 'General' },
+  { id: 'attendance', label: 'Attendance', icon: Clock, to: '/attendance', category: 'General' },
+  { id: 'leave', label: 'Leave', icon: CalendarDays, to: '/leave', category: 'General' },
   { id: 'employees', label: 'Employees', icon: Users, to: '/employee-management', end: true, category: 'Employee Management' },
   { id: 'user-operations', label: 'User-specific Operations', icon: UserCog, to: '/employee-management/user-operations', category: 'Employee Management' },
   { id: 'insights', label: 'Insights', icon: BarChart3, to: '/employee-management/insights', category: 'Employee Management' },
@@ -35,9 +39,7 @@ const allModules: ModuleItem[] = [
   { id: 'designations', label: 'Designations', icon: Award, to: '/employee-management/designations', category: 'Employee Management' },
 ];
 
-const defaultFavourites = ['dashboard', 'employee-management'];
-
-
+const defaultFavourites = ['dashboard', 'employees', 'attendance', 'leave'];
 
 function AllModulesPanel({ onClose }: { onClose: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
